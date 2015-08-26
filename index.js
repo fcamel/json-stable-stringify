@@ -18,6 +18,11 @@ module.exports = function (obj, opts) {
         };
     })(opts.cmp);
 
+    // Detect circular structure in obj and raise error efficiently.
+    if (!cycles) {
+      JSON.stringify(obj);
+    }
+
     var seen = [];
     return (function stringify (parent, key, node, level) {
         var indent = space ? ('\n' + new Array(level + 1).join(space)) : '';
@@ -44,11 +49,13 @@ module.exports = function (obj, opts) {
             return '[' + out.join(',') + indent + ']';
         }
         else {
-            if (seen.indexOf(node) !== -1) {
-                if (cycles) return json.stringify('__cycle__');
-                throw new TypeError('Converting circular structure to JSON');
+            if (cycles) {
+                if (seen.indexOf(node) !== -1) {
+                    return json.stringify('__cycle__');
+                } else {
+                  seen.push(node);
+                }
             }
-            else seen.push(node);
 
             var keys = objectKeys(node).sort(cmp && cmp(node));
             var out = [];
