@@ -20,7 +20,7 @@ module.exports = function (obj, opts) {
 
     // Detect circular structure in obj and raise error efficiently.
     if (!cycles) {
-      JSON.stringify(obj);
+      json.stringify(obj);
     }
 
     var seen = [];
